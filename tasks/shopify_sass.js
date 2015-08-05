@@ -47,8 +47,32 @@ module.exports = function(grunt) {
 
                     // Skip the file if it doesn't exist
                     if (!grunt.file.exists(importFile)) {
-                        grunt.log.warn('File to import: "' + importFile + '" not found.');
-                        continue;
+                        importFile = importFile + '.scss';
+                    }
+
+                    if (!grunt.file.exists(importFile)) {
+                        //Check against extension
+                        var parts = importFile.split(path.sep);
+                        if (!parts[parts.length - 1]) {
+                            grunt.log.warn('File to import: "' + importFile + '" not found.');
+                            continue;
+                        }
+
+                        var fileName = '_' + parts[parts.length - 1];
+                        parts.pop();
+                        parts.shift();
+
+                        var basePath = parts.join(path.sep);
+                        if (basePath !== '') {
+                            basePath += path.sep;
+                        }
+
+                        //Check against underscore
+                        importFile = path.join(path.dirname(filepath),  basePath + fileName);
+                        if (!grunt.file.exists(importFile)) {
+                            grunt.log.warn('File to import: "' + importFile + '" not found.');
+                            continue;
+                        }
                     }
 
                     imports[match[0]] = importFile;
